@@ -59,6 +59,34 @@ export class MovieReviewAppStack extends cdk.Stack {
       }),
     });
 
+    const getMovieReviewByMovieIdFn = new lambdanode.NodejsFunction(
+      this,
+      "GetMovieReviewByMovieIdFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_22_X,
+        entry: `${__dirname}/../lambdas/getMovieReviewByMovieId.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: moviesTable.tableName,
+          REGION: 'eu-west-1',
+        },
+      }
+    );
+
+    const getMovieReviewByMovieIdURL = getMovieReviewByMovieIdFn.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+      cors: {
+        allowedOrigins: ["*"],
+      },
+    });
+
+    moviesTable.grantReadData(getMovieReviewByMovieIdFn)
+
+    new cdk.CfnOutput(this, "Get Movie Function Url", { value: getMovieReviewByMovieIdURL.url });
+
+
 
 
     new cdk.CfnOutput(this, "Simple Function Url", { value: simpleFnURL.url });
