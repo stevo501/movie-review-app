@@ -38,6 +38,7 @@ export class MovieReviewAppStack extends cdk.Stack {
     const moviesTable = new dynamodb.Table(this, "MoviesTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       partitionKey: { name: "MovieId", type: dynamodb.AttributeType.NUMBER },
+      sortKey: { name: 'ReviewId', type: dynamodb.AttributeType.NUMBER },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       tableName: "MovieReviews",
     });
