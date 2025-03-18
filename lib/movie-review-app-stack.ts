@@ -37,11 +37,18 @@ export class MovieReviewAppStack extends cdk.Stack {
 
     const moviesTable = new dynamodb.Table(this, "MoviesTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      partitionKey: { name: "MovieId", type: dynamodb.AttributeType.NUMBER },
-      sortKey: { name: 'ReviewId', type: dynamodb.AttributeType.NUMBER },
+      partitionKey: { name: "movieId", type: dynamodb.AttributeType.NUMBER },
+      sortKey: { name: 'reviewId', type: dynamodb.AttributeType.NUMBER },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       tableName: "MovieReviews",
     });
+
+    moviesTable.addLocalSecondaryIndex({
+      indexName: "reviewerIx",
+      sortKey: { name: "reviewerId", type: dynamodb.AttributeType.STRING },
+ });
+
+
 
     new custom.AwsCustomResource(this, "moviesddbInitData", {
       onCreate: {
@@ -84,7 +91,8 @@ export class MovieReviewAppStack extends cdk.Stack {
 
     moviesTable.grantReadData(getMovieReviewByMovieIdFn)
 
-    new cdk.CfnOutput(this, "Get Movie Function Url", { value: getMovieReviewByMovieIdURL.url });
+    
+    new cdk.CfnOutput(this, "Get All Movie Reviews via Movie ID Function Url", { value: getMovieReviewByMovieIdURL.url });
 
 
 
