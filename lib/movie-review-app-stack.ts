@@ -5,6 +5,7 @@ import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as custom from "aws-cdk-lib/custom-resources";
 import { generateBatch } from "../shared/util";
 import {moviereviews} from "../seed/movie-reviews";
+import * as apig from "aws-cdk-lib/aws-apigateway";
 
 import { Construct } from 'constructs';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
@@ -89,14 +90,41 @@ export class MovieReviewAppStack extends cdk.Stack {
       },
     });
 
+    //Permissions
     moviesTable.grantReadData(getMovieReviewByMovieIdFn)
+
+    //REST Api
+    const api = new apig.RestApi(this, "MovieReviewRestAPI", {
+      description: "Movie Review api",
+      deployOptions: {
+        stageName: "dev",
+      },
+      defaultCorsPreflightOptions: {
+        allowHeaders: ["Content-Type", "X-Amz-Date"],
+        allowMethods: ["OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"],
+        allowCredentials: true,
+        allowOrigins: ["*"],
+      },
+    });
+
+    //movies endpoint
+    const moviesEndpoint = api.root.addResource("movies");
+
+    // reviews endpoint
+    const reviewsEndpoint = api.root.addResource("reviews");
+    reviewsEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getMovieReviewByMovieIdFn, { proxy: true })
+    );
+    // Detail movie endpoint
+    const specificMovieEndpoint = reviewsEndpoint.addResource("{movieId}");
+    specificMovieEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getMovieReviewByMovieIdFn, { proxy: true })
+    );
 
     
     new cdk.CfnOutput(this, "Get All Movie Reviews via Movie ID Function Url", { value: getMovieReviewByMovieIdURL.url });
-
-
-
-
     new cdk.CfnOutput(this, "Simple Function Url", { value: simpleFnURL.url });
   }
 }

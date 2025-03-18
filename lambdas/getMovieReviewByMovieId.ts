@@ -1,4 +1,5 @@
-import { Handler } from "aws-lambda";
+//import { Handler } from "aws-lambda";
+import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
@@ -8,11 +9,16 @@ import {
 
 const ddbDocClient = createDocumentClient();
 
-export const handler: Handler = async (event, context) => {
+export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
-    console.log("Event: ", JSON.stringify(event));
-    const queryParams = event?.queryStringParameters;
-    if (!queryParams) {
+    //console.log("[EVENT] ", JSON.stringify(event));
+    //const queryParams = event?.queryStringParameters;
+
+    console.log("[EVENT]", JSON.stringify(event));
+    const pathParameters  = event?.pathParameters;
+    //const movieId = pathParameters?.movieId ? parseInt(pathParameters.movieId) : undefined;
+
+    if (!pathParameters) {
       return {
         statusCode: 500,
         headers: {
@@ -21,7 +27,7 @@ export const handler: Handler = async (event, context) => {
         body: JSON.stringify({ message: "Missing query parameters" }),
  };
  }
-    if (!queryParams.movieId) {
+    if (!pathParameters.movieId) {
       return {
         statusCode: 500,
         headers: {
@@ -30,28 +36,28 @@ export const handler: Handler = async (event, context) => {
         body: JSON.stringify({ message: "Missing movie Id parameter" }),
  };
  }
-    const movieId = parseInt(queryParams?.movieId);
+    const movieId = pathParameters?.movieId ? parseInt(pathParameters.movieId) : undefined;
     let commandInput: QueryCommandInput = {
       TableName: process.env.TABLE_NAME,
  };
-    if ("reviewId" in queryParams) {
+    if ("reviewId" in pathParameters) {
       commandInput = {
  ...commandInput,
         //IndexName: "reviewerIx",
         KeyConditionExpression: "movieId = :m and begins_with(reviewId, :r) ",
         ExpressionAttributeValues: {
           ":m": movieId,
-          ":r": queryParams.reviewId,
+          ":r": pathParameters.reviewId,
  },
  };
- } else if ("reviewerName" in queryParams) {
+ } else if ("reviewerName" in pathParameters) {
       commandInput = {
  ...commandInput,
         IndexName: "reviewerIx",
         KeyConditionExpression: "movieId = :m and begins_with(reviewerName, :a) ",
         ExpressionAttributeValues: {
           ":m": movieId,
-          ":a": queryParams.reviewerId,
+          ":a": pathParameters.reviewerId,
  },
  };
  } else {
