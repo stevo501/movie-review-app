@@ -67,6 +67,29 @@ export class MovieReviewAppStack extends cdk.Stack {
       }),
     });
 
+    const getMovieReviewsFn = new lambdanode.NodejsFunction(
+      this,
+      "GetMovieReviewsFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_22_X,
+        entry: `${__dirname}/../lambdas/getMovieReviews.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: moviesTable.tableName,
+          REGION: "eu-west-1",
+        },
+      }
+    );
+
+    const getMovieReviewsURL = getMovieReviewsFn.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+      cors: {
+        allowedOrigins: ["*"],
+      },
+    });
+
     const getMovieReviewByMovieIdFn = new lambdanode.NodejsFunction(
       this,
       "GetMovieReviewByMovieIdFn",
@@ -127,6 +150,7 @@ export class MovieReviewAppStack extends cdk.Stack {
 
 
     //Permissions
+    moviesTable.grantReadData(getMovieReviewsFn)
     moviesTable.grantReadData(getMovieReviewByMovieIdFn)
     moviesTable.grantReadData(getMovieReviewByReviewIdFn)
     moviesTable.grantReadWriteData(newMovieReviewFn)
@@ -160,11 +184,14 @@ export class MovieReviewAppStack extends cdk.Stack {
     );
     //const specificMovieEndpoint = reviewsEndpoint.addResource("{movieId}");
     
-    
     reviewsEndpoint.addMethod(
       "GET",
-      new apig.LambdaIntegration(getMovieReviewByMovieIdFn, { proxy: true })
+      new apig.LambdaIntegration(getMovieReviewsFn, { proxy: true })
     );
+    //reviewsEndpoint.addMethod(
+      //"GET",
+      //new apig.LambdaIntegration(getMovieReviewByMovieIdFn, { proxy: true })
+   // );
     
     //const specificMovieReviewEndpoint = reviewsEndpoint.addResource("{reviewId}");
     //specificMovieReviewEndpoint.addMethod(
@@ -172,7 +199,7 @@ export class MovieReviewAppStack extends cdk.Stack {
       //new apig.LambdaIntegration(getMovieReviewByReviewIdFn, { proxy: true })
    // );
 
-    
+   new cdk.CfnOutput(this, "Get All Movie Reviews via Specified Movie Function Url", { value: getMovieReviewByMovieIdURL.url });
     new cdk.CfnOutput(this, "Get All Movie Reviews via Movie ID Function Url", { value: getMovieReviewByMovieIdURL.url });
     new cdk.CfnOutput(this, "Get All Movie Reviews via Review ID Function Url", { value: getMovieReviewByReviewIdURL.url });
     new cdk.CfnOutput(this, "Simple Function Url", { value: simpleFnURL.url });
