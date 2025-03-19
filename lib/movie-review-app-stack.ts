@@ -90,52 +90,6 @@ export class MovieReviewAppStack extends cdk.Stack {
       },
     });
 
-    const getMovieReviewByMovieIdFn = new lambdanode.NodejsFunction(
-      this,
-      "GetMovieReviewByMovieIdFn",
-      {
-        architecture: lambda.Architecture.ARM_64,
-        runtime: lambda.Runtime.NODEJS_22_X,
-        entry: `${__dirname}/../lambdas/getMovieReviewByMovieId.ts`,
-        timeout: cdk.Duration.seconds(10),
-        memorySize: 128,
-        environment: {
-          TABLE_NAME: moviesTable.tableName,
-          REGION: 'eu-west-1',
-        },
-      }
-    );
-
-    const getMovieReviewByMovieIdURL = getMovieReviewByMovieIdFn.addFunctionUrl({
-      authType: lambda.FunctionUrlAuthType.NONE,
-      cors: {
-        allowedOrigins: ["*"],
-      },
-    });
-
-    const getMovieReviewByReviewIdFn = new lambdanode.NodejsFunction(
-      this,
-      "GetMovieReviewByReviewIdFn",
-      {
-        architecture: lambda.Architecture.ARM_64,
-        runtime: lambda.Runtime.NODEJS_22_X,
-        entry: `${__dirname}/../lambdas/getMovieReviewByReviewId.ts`,
-        timeout: cdk.Duration.seconds(10),
-        memorySize: 128,
-        environment: {
-          TABLE_NAME: moviesTable.tableName,
-          REGION: 'eu-west-1',
-        },
-      }
-    );
-
-    const getMovieReviewByReviewIdURL = getMovieReviewByReviewIdFn.addFunctionUrl({
-      authType: lambda.FunctionUrlAuthType.NONE,
-      cors: {
-        allowedOrigins: ["*"],
-      },
-    });
-
     const newMovieReviewFn = new lambdanode.NodejsFunction(this, "AddMovieReviewFn", {
       architecture: lambda.Architecture.ARM_64,
       runtime: lambda.Runtime.NODEJS_22_X,
@@ -151,8 +105,6 @@ export class MovieReviewAppStack extends cdk.Stack {
 
     //Permissions
     moviesTable.grantReadData(getMovieReviewsFn)
-    moviesTable.grantReadData(getMovieReviewByMovieIdFn)
-    moviesTable.grantReadData(getMovieReviewByReviewIdFn)
     moviesTable.grantReadWriteData(newMovieReviewFn)
 
     //REST Api
@@ -188,20 +140,9 @@ export class MovieReviewAppStack extends cdk.Stack {
       "GET",
       new apig.LambdaIntegration(getMovieReviewsFn, { proxy: true })
     );
-    //reviewsEndpoint.addMethod(
-      //"GET",
-      //new apig.LambdaIntegration(getMovieReviewByMovieIdFn, { proxy: true })
-   // );
+   
     
-    //const specificMovieReviewEndpoint = reviewsEndpoint.addResource("{reviewId}");
-    //specificMovieReviewEndpoint.addMethod(
-      //"GET",
-      //new apig.LambdaIntegration(getMovieReviewByReviewIdFn, { proxy: true })
-   // );
-
-   new cdk.CfnOutput(this, "Get All Movie Reviews via Specified Movie Function Url", { value: getMovieReviewByMovieIdURL.url });
-    new cdk.CfnOutput(this, "Get All Movie Reviews via Movie ID Function Url", { value: getMovieReviewByMovieIdURL.url });
-    new cdk.CfnOutput(this, "Get All Movie Reviews via Review ID Function Url", { value: getMovieReviewByReviewIdURL.url });
+    new cdk.CfnOutput(this, "Get All Movie Reviews via Specified Movie Function Url", { value: getMovieReviewsURL.url });
     new cdk.CfnOutput(this, "Simple Function Url", { value: simpleFnURL.url });
   }
 }

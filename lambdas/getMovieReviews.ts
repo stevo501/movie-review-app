@@ -50,7 +50,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     if ("reviewId" in queryParams) {
       commandInput = {
         ...commandInput,
-        //IndexName: "reviewerIx",
         KeyConditionExpression: "movieId = :m and reviewId = :r ",
         ExpressionAttributeValues: {
           ":m": movieId,
