@@ -14,11 +14,11 @@ export const generateMovieReviewItem = (entity: Entity) => {
   return {
     PutRequest: {
       Item: marshall(entity),
- },
+   },
  };
 };
 
-export const generateBatch = (data: MovieReviews[]) => {
+export const generateBatch = (data: Entity[]) => {
   return data.map((e) => {
     return generateMovieReviewItem(e);
   });

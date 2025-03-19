@@ -158,10 +158,10 @@ export class MovieReviewAppStack extends cdk.Stack {
       "POST",
       new apig.LambdaIntegration(newMovieReviewFn, { proxy: true })
     );
-    const specificMovieEndpoint = reviewsEndpoint.addResource("{movieId}");
+    //const specificMovieEndpoint = reviewsEndpoint.addResource("{movieId}");
     
     
-    specificMovieEndpoint.addMethod(
+    reviewsEndpoint.addMethod(
       "GET",
       new apig.LambdaIntegration(getMovieReviewByMovieIdFn, { proxy: true })
     );
