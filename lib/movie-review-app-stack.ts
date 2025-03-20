@@ -140,7 +140,7 @@ export class MovieReviewAppStack extends cdk.Stack {
     const updateReviewEndpint = specificMovieEndpoint.addResource("reviews").addResource("{reviewId}");
 
     // reviews endpoint
-    const reviewsEndpoint = api.root.addResource("reviews");
+    const reviewsEndpoint = moviesEndpoint.addResource("reviews");
     
     
 
