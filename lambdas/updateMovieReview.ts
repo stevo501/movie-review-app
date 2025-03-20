@@ -1,5 +1,5 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { AttributeValue, DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import Ajv from "ajv";
 import schema from "../shared/types.schema.json";
@@ -64,6 +64,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       new UpdateCommand({
         TableName: process.env.TABLE_NAME,
         Key: {movieId: movieId, reviewId: reviewId },
+        ConditionExpression: "attribute_exists(reviewId)",
         UpdateExpression: "SET content = :content",
         ExpressionAttributeValues: {":content": body}
       })
