@@ -10,6 +10,8 @@ import * as apig from "aws-cdk-lib/aws-apigateway";
 import { Construct } from 'constructs';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
+
+
 export class MovieReviewAppStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -115,10 +117,7 @@ export class MovieReviewAppStack extends cdk.Stack {
     });
 
 
-    //Permissions
-    moviesTable.grantReadData(getMovieReviewsFn)
-    moviesTable.grantReadWriteData(newMovieReviewFn)
-    moviesTable.grantReadWriteData(updateMovieReviewFn)
+    
 
     //REST Api
     const api = new apig.RestApi(this, "MovieReviewRestAPI", {
