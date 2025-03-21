@@ -46,17 +46,17 @@ export class AppApi extends Construct {
 
     const protectedFn = new node.NodejsFunction(this, "ProtectedFn", {
       ...appCommonFnProps,
-      entry: "./lambda/protected.ts",
+      entry: "./lambdas/protected.ts",
     });
 
     const publicFn = new node.NodejsFunction(this, "PublicFn", {
       ...appCommonFnProps,
-      entry: "./lambda/public.ts",
+      entry: "./lambdas/public.ts",
     });
 
     const authorizerFn = new node.NodejsFunction(this, "AuthorizerFn", {
       ...appCommonFnProps,
-      entry: "./lambda/auth/authorizer.ts",
+      entry: "./lambdas/auth/authorizer.ts",
     });
 
     const requestAuthorizer = new apig.RequestAuthorizer(
