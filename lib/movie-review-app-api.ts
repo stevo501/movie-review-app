@@ -155,11 +155,25 @@ export class AppApi extends Construct {
         
     
 
+    //movies endpoints protected access
+    const updateReviewEndpint = protectedRes.addResource("reviews").addResource("{reviewId}");
+    
     protectedRes.addMethod("GET", new apig.LambdaIntegration(protectedFn), {
       authorizer: requestAuthorizer,
       authorizationType: apig.AuthorizationType.CUSTOM,
     });
 
+    
+   //movies endpoints public access
+    const movieReviewsEndpoint = publicRes.addResource("movies").addResource("reviews");
+
     publicRes.addMethod("GET", new apig.LambdaIntegration(publicFn));
+
+    movieReviewsEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getMovieReviewsFn, { proxy: true })
+    );
+    
+    
   }
 }
