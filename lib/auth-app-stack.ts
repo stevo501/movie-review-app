@@ -38,6 +38,13 @@ export class AuthAppStack extends cdk.Stack {
     });
 
     this.auth = authApi.root.addResource("auth");
+
+    this.addAuthRoute(
+        "signup",
+        "POST",
+        "SignupFn",
+        'signup.ts'
+      );
   }
 
   private addAuthRoute(
@@ -47,6 +54,7 @@ export class AuthAppStack extends cdk.Stack {
     fnEntry: string,
     allowCognitoAccess?: boolean
   ): void {
+    
     const commonFnProps = {
       architecture: lambda.Architecture.ARM_64,
       timeout: cdk.Duration.seconds(10),
