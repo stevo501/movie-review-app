@@ -67,18 +67,6 @@
             ],
             "type": "object"
         },
-        "MovieUpdateReviews": {
-            "additionalProperties": false,
-            "properties": {
-                "content": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "content"
-            ],
-            "type": "object"
-        },
         "SignInBody": {
             "additionalProperties": false,
             "properties": {

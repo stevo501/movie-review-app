@@ -157,7 +157,8 @@ export class AppApi extends Construct {
 
     //movies endpoints protected access
     const postReviewEndpoint = protectedRes.addResource("Movies").addResource("Reviews");
-    const updateReviewEndpoint = protectedRes.addResource("reviews").addResource("{reviewId}");
+    const updateReviewEndPoint = protectedRes.addResource("movies").addResource("{movieId}").addResource("reviews").addResource("{reviewId}");
+
     
     protectedRes.addMethod("GET", new apig.LambdaIntegration(protectedFn),  {
       authorizer: requestAuthorizer,
@@ -169,8 +170,14 @@ export class AppApi extends Construct {
       new apig.LambdaIntegration(newMovieReviewFn, { proxy: true }), {
       authorizer: requestAuthorizer,
       authorizationType: apig.AuthorizationType.CUSTOM,
-      }
-    );
+      });
+
+    updateReviewEndPoint.addMethod(
+      "PUT",
+      new apig.LambdaIntegration(updateMovieReviewFn, { proxy: true }), {
+      authorizer: requestAuthorizer,
+      authorizationType: apig.AuthorizationType.CUSTOM,
+      });
 
     
    //movies endpoints public access
