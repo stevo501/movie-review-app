@@ -146,6 +146,22 @@ export class AppApi extends Construct {
          REGION: "eu-west-1",
        },
     });
+
+    const translateMovieReviewsFn = new lambdanode.NodejsFunction(
+      this,
+      "translateMovieReviewsFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_22_X,
+        entry: `${__dirname}/../lambdas/translateMovieReview.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: moviesTable.tableName,
+          REGION: "eu-west-1",
+        },
+      }
+    );
         
         
     //Permissions
@@ -188,6 +204,13 @@ export class AppApi extends Construct {
     movieReviewsEndpoint.addMethod(
       "GET",
       new apig.LambdaIntegration(getMovieReviewsFn, { proxy: true })
+    );
+
+    const translateMovieReviewEndpoint = publicRes.addResource("reviews").addResource("{reviewId}").addResource("{movieId}").addResource("translation");
+
+    translateMovieReviewEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(translateMovieReviewsFn, { proxy: true })
     );
     
     

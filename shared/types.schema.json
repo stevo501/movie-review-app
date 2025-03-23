@@ -102,6 +102,22 @@
                 "username"
             ],
             "type": "object"
+        },
+        "TranslateMovieReviewsQueryParams": {
+            "additionalProperties": false,
+            "properties": {
+                "movieId": {
+                    "type": "string"
+                },
+                "reviewId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "movieId",
+                "reviewId"
+            ],
+            "type": "object"
         }
     }
 }
